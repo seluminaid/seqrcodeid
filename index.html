@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeQRCode — QR Code & Barcode Generator</title>
+<meta name="description" content="Generate QR codes and barcodes quickly from text, links, and other data.">
+<meta property="og:title" content="SeQRCode — QR Code & Barcode Generator">
+<meta property="og:description" content="Generate QR codes and barcodes quickly from text, links, and other data.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F4F1;
+  --surface: #FFFFFF;
+  --surface-2: #FBFAF8;
+  --border: #E2E0DA;
+  --text: #1C1B19;
+  --text-dim: #6B6862;
+  --accent: #B5772E;
+  --accent-strong: #93611F;
+  --accent-contrast: #FFFFFF;
+  --accent-soft: #F1E2CC;
+  --danger: #B3261E;
+  --success: #2E7D4F;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 1px 2px rgba(28,27,25,0.06), 0 8px 24px -12px rgba(28,27,25,0.18);
+  --font-display: "Sora", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #121316;
+  --surface: #1B1D22;
+  --surface-2: #202329;
+  --border: #2E3138;
+  --text: #ECEDEE;
+  --text-dim: #9AA0A8;
+  --accent: #E8A33D;
+  --accent-strong: #F2B45C;
+  --accent-contrast: #1C1300;
+  --accent-soft: #3A2C13;
+  --danger: #F2857A;
+  --success: #6FCF97;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; color: var(--text); }
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.is-hidden { display: none !important; }
+.nav { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.nav-inner { max-width: 1080px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--text); margin-right: auto; }
+.logo-mark { width: 10px; height: 10px; border-radius: 2px; background: var(--accent); transform: rotate(45deg); flex-shrink: 0; }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { text-decoration: none; font-size: 0.92rem; font-weight: 500; color: var(--text-dim); }
+.nav-links a:hover { color: var(--text); }
+.icon-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); height: 36px; padding: 0 12px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; font-size: 0.82rem; font-weight: 600; }
+.theme-toggle { width: 36px; padding: 0; }
+.icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+.hero { padding: 64px 20px 32px; text-align: center; }
+.hero-inner { max-width: 620px; margin: 0 auto; }
+.hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+.hero-sub { margin-top: 14px; color: var(--text-dim); font-size: 1.05rem; line-height: 1.6; }
+.generator-section { max-width: 640px; margin: 0 auto; padding: 0 20px 56px; display: flex; flex-direction: column; gap: 20px; }
+.generator-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 22px; }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; margin-bottom: 20px; }
+.tab { flex: 1; border: none; background: transparent; padding: 9px 12px; border-radius: 7px; font-size: 0.92rem; font-weight: 600; color: var(--text-dim); }
+.tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.panel { display: none; }
+.panel.active { display: block; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+.field input[type="text"], .field select { width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 0.95rem; font-family: var(--font-body); }
+.field input[type="text"]:focus, .field select:focus { border-color: var(--accent); }
+.field input.input-error { border-color: var(--danger); }
+.options-row { display: flex; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+.field-small { flex: 1; min-width: 120px; }
+.hint { font-size: 0.82rem; color: var(--text-dim); margin: -4px 0 14px; }
+.actions { display: flex; gap: 10px; margin: 18px 0 4px; }
+.btn { border-radius: var(--radius-sm); padding: 11px 20px; font-size: 0.92rem; font-weight: 600; border: 1px solid transparent; }
+.btn-primary { background: var(--accent); color: var(--accent-contrast); }
+.btn-primary:hover { background: var(--accent-strong); }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-text { background: transparent; border: none; color: var(--text-dim); padding: 4px 6px; font-size: 0.85rem; }
+.btn-text:hover { color: var(--danger); }
+.result-area { margin-top: 18px; border: 1px dashed var(--border); border-radius: var(--radius-md); min-height: 180px; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--surface-2); }
+.empty-state { text-align: center; color: var(--text-dim); }
+.empty-state svg { margin-bottom: 8px; opacity: 0.6; }
+.empty-state p { margin: 0; font-size: 0.9rem; }
+.result-box { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.code-canvas-holder { background: #fff; padding: 12px; border-radius: var(--radius-sm); max-width: 100%; }
+.code-canvas-holder canvas, .code-canvas-holder img { max-width: 100%; height: auto; display: block; }
+.result-actions { display: flex; justify-content: center; width: 100%; }
+.result-actions .btn { width: 100%; max-width: 240px; }
+.privacy-note { margin: 18px 0 0; text-align: center; font-size: 0.78rem; color: var(--text-dim); }
+.history-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 22px; }
+.history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.history-header h2 { font-size: 1rem; font-weight: 700; }
+.history-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+.history-empty { color: var(--text-dim); font-size: 0.88rem; padding: 8px 2px; }
+.history-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; }
+.history-item .history-type { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); flex-shrink: 0; }
+.history-item .history-data { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.history-item .history-time { color: var(--text-dim); font-size: 0.75rem; flex-shrink: 0; }
+.history-item button { border: none; background: transparent; color: var(--text-dim); padding: 2px 4px; flex-shrink: 0; }
+.history-item button:hover { color: var(--danger); }
+.section-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+.why-section, .tools-section { padding: 48px 0; border-top: 1px solid var(--border); }
+.why-section h2, .tools-section h2 { font-size: 1.5rem; margin-bottom: 24px; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.feature { border-left: 2px solid var(--accent); padding-left: 16px; }
+.feature h3 { font-size: 1rem; margin-bottom: 4px; }
+.feature p { margin: 0; color: var(--text-dim); font-size: 0.9rem; }
+.tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.tool-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; }
+.tool-card h3 { font-size: 0.98rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tool-card p { margin: 0; color: var(--text-dim); font-size: 0.88rem; }
+.tool-card-soon { opacity: 0.7; }
+.badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
+.footer { border-top: 1px solid var(--border); padding: 40px 0 0; }
+.footer-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }
+.footer-brand p.footer-title { font-family: var(--font-display); font-weight: 700; margin: 0 0 6px; font-size: 1.05rem; }
+.footer-brand p.footer-tag { margin: 0; color: var(--text-dim); font-size: 0.88rem; max-width: 260px; }
+.footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin: 0 0 12px; font-weight: 700; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.footer-col a, .footer-col button { background: none; border: none; padding: 0; text-align: left; font-size: 0.9rem; color: var(--text-dim); text-decoration: none; }
+.footer-col a:hover, .footer-col button:hover { color: var(--text); }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 32px; padding: 16px 20px; text-align: center; font-size: 0.82rem; color: var(--text-dim); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+.modal-box { background: var(--surface); border-radius: var(--radius-lg); max-width: 480px; width: 100%; padding: 24px; box-shadow: var(--shadow); max-height: 80vh; overflow-y: auto; }
+.modal-box h3 { margin-bottom: 12px; }
+.modal-box p { color: var(--text-dim); font-size: 0.92rem; line-height: 1.6; }
+.modal-close { margin-top: 16px; }
+.toast-stack { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 300; width: min(92vw, 360px); }
+.toast { background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.88rem; box-shadow: var(--shadow); }
+.toast.toast-error { background: var(--danger); color: #fff; }
+.toast.toast-success { background: var(--success); color: #08240F; }
+@media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+@media (max-width: 640px) {
+  .feature-grid { grid-template-columns: 1fr; gap: 20px; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .generator-card { padding: 18px; }
+  .options-row { flex-direction: column; }
+  .footer-inner { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark" aria-hidden="true"></span>
+      SeQRCode
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+    </nav>
+    <button id="langToggle" class="icon-btn lang-toggle" type="button">EN</button>
+    <button id="themeToggle" class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 data-i18n="hero_title">Generate QR Code &amp; Barcode Instantly</h1>
+      <p class="hero-sub" data-i18n="hero_sub">Create QR codes and barcodes from text, links, or other data in seconds, right in your browser.</p>
+    </div>
+  </section>
+
+  <section class="generator-section" id="generator">
+    <div class="generator-card">
+
+      <div class="tabs" role="tablist" aria-label="Generator type">
+        <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-qr" id="tab-qr" data-tab="qr" data-i18n="tab_qr">QR Code</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-barcode" id="tab-barcode" data-tab="barcode" data-i18n="tab_barcode">Barcode</button>
+      </div>
+
+      <div class="panel active" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr">
+        <div class="field">
+          <label for="qrInput" data-i18n="label_text_url">Text / URL</label>
+          <input type="text" id="qrInput" placeholder="https://example.com" autocomplete="off">
+        </div>
+
+        <div class="options-row">
+          <div class="field field-small">
+            <label for="qrSize" data-i18n="label_size">Size</label>
+            <select id="qrSize">
+              <option value="180" data-i18n="size_small">Small (180px)</option>
+              <option value="256" selected data-i18n="size_medium">Medium (256px)</option>
+              <option value="384" data-i18n="size_large">Large (384px)</option>
+            </select>
+          </div>
+          <div class="field field-small">
+            <label for="qrMargin" data-i18n="label_margin">Margin</label>
+            <select id="qrMargin">
+              <option value="0" data-i18n="margin_none">None</option>
+              <option value="1" data-i18n="margin_small">Small</option>
+              <option value="4" selected data-i18n="margin_normal">Normal</option>
+              <option value="8" data-i18n="margin_wide">Wide</option>
+            </select>
+          </div>
+          <div class="field field-small">
+            <label for="qrEcc" data-i18n="label_ecc">Error correction</label>
+            <select id="qrEcc">
+              <option value="L" data-i18n="ecc_low">Low (L)</option>
+              <option value="M" selected data-i18n="ecc_medium">Medium (M)</option>
+              <option value="Q" data-i18n="ecc_quartile">Quartile (Q)</option>
+              <option value="H" data-i18n="ecc_high">High (H)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="qrGenerateBtn" type="button" data-i18n="btn_generate">Generate</button>
+          <button class="btn btn-ghost" id="qrResetBtn" type="button" data-i18n="btn_reset">Reset</button>
+        </div>
+
+        <div class="result-area" id="qrResultArea">
+          <div class="empty-state" id="qrEmptyState">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 14v3M14 19h3M19 19h.01"/></svg>
+            <p data-i18n="empty_qr">Your QR code will appear here.</p>
+          </div>
+          <div class="result-box is-hidden" id="qrResultBox">
+            <div id="qrCanvasHolder" class="code-canvas-holder"></div>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="qrDownloadBtn" type="button" data-i18n="btn_download">Download PNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-barcode" role="tabpanel" aria-labelledby="tab-barcode">
+        <div class="field">
+          <label for="barcodeInput" data-i18n="label_data">Data</label>
+          <input type="text" id="barcodeInput" placeholder="e.g. 123456789012" autocomplete="off">
+        </div>
+
+        <div class="options-row">
+          <div class="field field-small">
+            <label for="barcodeFormat" data-i18n="label_format">Format</label>
+            <select id="barcodeFormat">
+              <option value="CODE128" selected>CODE128</option>
+              <option value="EAN13">EAN-13</option>
+              <option value="UPC">UPC</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="hint" id="barcodeHint">CODE128 accepts any text or number.</p>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="barcodeGenerateBtn" type="button" data-i18n="btn_generate">Generate</button>
+          <button class="btn btn-ghost" id="barcodeResetBtn" type="button" data-i18n="btn_reset">Reset</button>
+        </div>
+
+        <div class="result-area" id="barcodeResultArea">
+          <div class="empty-state" id="barcodeEmptyState">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4v16M7 4v16M10 4v16M14 4v16M17 4v16M21 4v16" stroke-linecap="round"/></svg>
+            <p data-i18n="empty_barcode">Your barcode will appear here.</p>
+          </div>
+          <div class="result-box is-hidden" id="barcodeResultBox">
+            <svg id="barcodeSvg" class="code-canvas-holder"></svg>
+            <div class="result-actions">
+              <button class="btn btn-primary" id="barcodeDownloadBtn" type="button" data-i18n="btn_download">Download PNG</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="privacy-note" data-i18n="privacy_note">Your data is processed locally in your browser.</p>
+    </div>
+
+    <div class="history-card">
+      <div class="history-header">
+        <h2 data-i18n="history_title">History</h2>
+        <button class="btn btn-text" id="historyClearBtn" type="button" data-i18n="history_clear">Clear all</button>
+      </div>
+      <ul class="history-list" id="historyList">
+        <li class="history-empty" id="historyEmpty" data-i18n="history_empty">No codes generated yet.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="why-section">
+    <div class="section-inner">
+      <h2 data-i18n="why_title">Why SeQRCode?</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3 data-i18n="feature_fast_title">Fast</h3>
+          <p data-i18n="feature_fast_desc">Generate codes instantly.</p>
+        </div>
+        <div class="feature">
+          <h3 data-i18n="feature_private_title">Private</h3>
+          <p data-i18n="feature_private_desc">Data stays in your browser.</p>
+        </div>
+        <div class="feature">
+          <h3 data-i18n="feature_free_title">Free</h3>
+          <p data-i18n="feature_free_desc">No account required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools-section" id="tools">
+    <div class="section-inner">
+      <h2 data-i18n="tools_title">Tools</h2>
+      <div class="tools-grid">
+        <div class="tool-card">
+          <h3 data-i18n="tool_qr_title">QR Code Generator</h3>
+          <p data-i18n="tool_qr_desc">Turn any text into a scannable QR code.</p>
+        </div>
+        <div class="tool-card">
+          <h3 data-i18n="tool_barcode_title">Barcode Generator</h3>
+          <p data-i18n="tool_barcode_desc">Create CODE128, EAN-13, and UPC barcodes.</p>
+        </div>
+        <div class="tool-card tool-card-soon">
+          <h3><span data-i18n="tool_url_title">URL to QR</span> <span class="badge" data-i18n="coming_soon">Coming Soon</span></h3>
+          <p data-i18n="tool_url_desc">Shorten and encode links in one step.</p>
+        </div>
+        <div class="tool-card tool-card-soon">
+          <h3><span data-i18n="tool_text_title">Text to QR</span> <span class="badge" data-i18n="coming_soon">Coming Soon</span></h3>
+          <p data-i18n="tool_text_desc">Batch-generate QR codes from a text list.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer" id="about">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <p class="footer-title">SeQRCode</p>
+      <p class="footer-tag" data-i18n="footer_tag">Simple tools for everyday digital needs.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_product">Product</h4>
+      <ul>
+        <li><a href="#generator" data-tab-target="qr" data-i18n="tab_qr">QR Code</a></li>
+        <li><a href="#generator" data-tab-target="barcode" data-i18n="tab_barcode">Barcode</a></li>
+        <li><a href="#tools" data-i18n="nav_tools">Tools</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_company">Company</h4>
+      <ul>
+        <li><a href="#about" data-i18n="nav_about">About</a></li>
+        <li><a href="mailto:seqrcodeid@gmail.com" data-i18n="footer_contact">Contact</a></li>
+        <li><button type="button" id="privacyLink" data-i18n="footer_privacy">Privacy Policy</button></li>
+        <li><button type="button" id="termsLink" data-i18n="footer_terms">Terms of Service</button></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span id="copyrightText">© 2026 SeQRCode. All rights reserved.</span>
+  </div>
+</footer>
+
+<div class="modal-overlay is-hidden" id="privacyModal">
+  <div class="modal-box">
+    <h3 data-i18n="footer_privacy">Privacy Policy</h3>
+    <p data-i18n="privacy_body">SeQRCode processes every QR code and barcode directly in your browser. Nothing you type is sent to a server, and no personal data is collected.</p>
+    <button class="btn btn-ghost modal-close" type="button" data-close-modal="privacyModal" data-i18n="modal_close">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay is-hidden" id="termsModal">
+  <div class="modal-box">
+    <h3 data-i18n="footer_terms">Terms of Service</h3>
+    <p data-i18n="terms_body">SeQRCode is provided as-is, free of charge, for generating QR codes and barcodes. You are responsible for the content you encode.</p>
+    <button class="btn btn-ghost modal-close" type="button" data-close-modal="termsModal" data-i18n="modal_close">Close</button>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/JsBarcode/3.11.5/JsBarcode.all.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var $all = function (s) { return Array.from(document.querySelectorAll(s)); };
+
+  var LANG_KEY = "seqrcode-lang";
+  var THEME_KEY = "seqrcode-theme";
+  var HISTORY_KEY = "seqrcode-history";
+  var HISTORY_LIMIT = 10;
+
+  var I18N = {
+    en: {
+      nav_tools: "Tools", nav_about: "About",
+      hero_title: "Generate QR Code &amp; Barcode Instantly",
+      hero_sub: "Create QR codes and barcodes from text, links, or other data in seconds, right in your browser.",
+      tab_qr: "QR Code", tab_barcode: "Barcode",
+      label_text_url: "Text / URL", label_size: "Size", label_margin: "Margin", label_ecc: "Error correction",
+      size_small: "Small (180px)", size_medium: "Medium (256px)", size_large: "Large (384px)",
+      margin_none: "None", margin_small: "Small", margin_normal: "Normal", margin_wide: "Wide",
+      ecc_low: "Low (L)", ecc_medium: "Medium (M)", ecc_quartile: "Quartile (Q)", ecc_high: "High (H)",
+      btn_generate: "Generate", btn_reset: "Reset", btn_download: "Download PNG",
+      empty_qr: "Your QR code will appear here.", empty_barcode: "Your barcode will appear here.",
+      label_data: "Data", label_format: "Format",
+      hint_code128: "CODE128 accepts any text or number.",
+      hint_ean13: "EAN-13 requires exactly 12 or 13 digits.",
+      hint_upc: "UPC requires exactly 11 or 12 digits.",
+      privacy_note: "Your data is processed locally in your browser.",
+      history_title: "History", history_clear: "Clear all", history_empty: "No codes generated yet.",
+      why_title: "Why SeQRCode?",
+      feature_fast_title: "Fast", feature_fast_desc: "Generate codes instantly.",
+      feature_private_title: "Private", feature_private_desc: "Data stays in your browser.",
+      feature_free_title: "Free", feature_free_desc: "No account required.",
+      tools_title: "Tools",
+      tool_qr_title: "QR Code Generator", tool_qr_desc: "Turn any text into a scannable QR code.",
+      tool_barcode_title: "Barcode Generator", tool_barcode_desc: "Create CODE128, EAN-13, and UPC barcodes.",
+      tool_url_title: "URL to QR", tool_url_desc: "Shorten and encode links in one step.",
+      tool_text_title: "Text to QR", tool_text_desc: "Batch-generate QR codes from a text list.",
+      coming_soon: "Coming Soon",
+      footer_tag: "Simple tools for everyday digital needs.",
+      footer_product: "Product", footer_company: "Company",
+      footer_contact: "Contact", footer_privacy: "Privacy Policy", footer_terms: "Terms of Service",
+      privacy_body: "SeQRCode processes every QR code and barcode directly in your browser. Nothing you type is sent to a server, and no personal data is collected.",
+      terms_body: "SeQRCode is provided as-is, free of charge, for generating QR codes and barcodes. You are responsible for the content you encode.",
+      modal_close: "Close",
+      err_empty: "Please enter data first.",
+      err_ean13: "EAN-13 must be 12–13 digits.",
+      err_upc: "UPC must be 11–12 digits.",
+      err_qr_generic: "Could not generate QR code. Try shorter data.",
+      err_barcode_generic: "This data is not valid for the selected barcode format.",
+      err_library: "Generator library failed to load. Check your connection and try again.",
+      err_theme_save: "Theme preference could not be saved on this device.",
+      err_history_save: "History could not be saved on this device.",
+      err_nothing_qr: "Nothing to download yet, generate a QR code first.",
+      err_nothing_barcode: "Nothing to download yet, generate a barcode first.",
+      err_download_prep: "Could not prepare the file for download.",
+      success_qr: "QR code generated.", success_barcode: "Barcode generated.", success_history_clear: "History cleared."
+    },
+    id: {
+      nav_tools: "Alat", nav_about: "Tentang",
+      hero_title: "Buat QR Code &amp; Barcode Secara Instan",
+      hero_sub: "Buat QR code dan barcode dari teks, tautan, atau data lainnya dalam hitungan detik, langsung di browser Anda.",
+      tab_qr: "Kode QR", tab_barcode: "Barcode",
+      label_text_url: "Teks / URL", label_size: "Ukuran", label_margin: "Margin", label_ecc: "Koreksi kesalahan",
+      size_small: "Kecil (180px)", size_medium: "Sedang (256px)", size_large: "Besar (384px)",
+      margin_none: "Tidak ada", margin_small: "Kecil", margin_normal: "Normal", margin_wide: "Lebar",
+      ecc_low: "Rendah (L)", ecc_medium: "Sedang (M)", ecc_quartile: "Kuartil (Q)", ecc_high: "Tinggi (H)",
+      btn_generate: "Buat", btn_reset: "Atur Ulang", btn_download: "Unduh PNG",
+      empty_qr: "QR code Anda akan muncul di sini.", empty_barcode: "Barcode Anda akan muncul di sini.",
+      label_data: "Data", label_format: "Format",
+      hint_code128: "CODE128 menerima teks atau angka apa pun.",
+      hint_ean13: "EAN-13 harus terdiri dari 12–13 digit angka.",
+      hint_upc: "UPC harus terdiri dari 11–12 digit angka.",
+      privacy_note: "Data Anda diproses secara lokal di browser Anda.",
+      history_title: "Riwayat", history_clear: "Hapus semua", history_empty: "Belum ada kode yang dibuat.",
+      why_title: "Mengapa SeQRCode?",
+      feature_fast_title: "Cepat", feature_fast_desc: "Buat kode secara instan.",
+      feature_private_title: "Privat", feature_private_desc: "Data tetap di browser Anda.",
+      feature_free_title: "Gratis", feature_free_desc: "Tanpa perlu akun.",
+      tools_title: "Alat",
+      tool_qr_title: "Generator QR Code", tool_qr_desc: "Ubah teks apa pun menjadi QR code yang bisa dipindai.",
+      tool_barcode_title: "Generator Barcode", tool_barcode_desc: "Buat barcode CODE128, EAN-13, dan UPC.",
+      tool_url_title: "URL ke QR", tool_url_desc: "Perpendek dan enkode tautan dalam satu langkah.",
+      tool_text_title: "Teks ke QR", tool_text_desc: "Buat banyak QR code sekaligus dari daftar teks.",
+      coming_soon: "Segera Hadir",
+      footer_tag: "Alat sederhana untuk kebutuhan digital sehari-hari.",
+      footer_product: "Produk", footer_company: "Perusahaan",
+      footer_contact: "Kontak", footer_privacy: "Kebijakan Privasi", footer_terms: "Ketentuan Layanan",
+      privacy_body: "SeQRCode memproses setiap QR code dan barcode langsung di browser Anda. Tidak ada yang Anda ketik dikirim ke server, dan tidak ada data pribadi yang dikumpulkan.",
+      terms_body: "SeQRCode disediakan apa adanya, gratis, untuk membuat QR code dan barcode. Anda bertanggung jawab atas konten yang Anda enkode.",
+      modal_close: "Tutup",
+      err_empty: "Masukkan data terlebih dahulu.",
+      err_ean13: "EAN-13 harus berupa 12–13 digit angka.",
+      err_upc: "UPC harus berupa 11–12 digit angka.",
+      err_qr_generic: "Gagal membuat QR code. Coba data yang lebih pendek.",
+      err_barcode_generic: "Data ini tidak valid untuk format barcode yang dipilih.",
+      err_library: "Generator library gagal dimuat. Periksa koneksi internet dan coba lagi.",
+      err_theme_save: "Preferensi tema tidak dapat disimpan di perangkat ini.",
+      err_history_save: "Riwayat tidak dapat disimpan di perangkat ini.",
+      err_nothing_qr: "Belum ada yang bisa diunduh, buat QR code terlebih dahulu.",
+      err_nothing_barcode: "Belum ada yang bisa diunduh, buat barcode terlebih dahulu.",
+      err_download_prep: "Gagal menyiapkan file untuk diunduh.",
+      success_qr: "QR code berhasil dibuat.", success_barcode: "Barcode berhasil dibuat.", success_history_clear: "Riwayat dihapus."
+    }
+  };
+
+  var currentLang = "en";
+
+  function t(key) {
+    return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.en[key] || key);
+  }
+
+  function applyTranslations() {
+    document.documentElement.lang = currentLang;
+    $all("[data-i18n]").forEach(function (el) {
+      el.innerHTML = t(el.getAttribute("data-i18n"));
+    });
+    $("#langToggle").textContent = currentLang === "en" ? "EN" : "ID";
+    updateBarcodeHint();
+  }
+
+  function setLang(lang) {
+    currentLang = lang === "id" ? "id" : "en";
+    try { localStorage.setItem(LANG_KEY, currentLang); } catch (e) {}
+    applyTranslations();
+  }
+
+  function initLang() {
+    var saved = null;
+    try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
+    currentLang = saved === "id" ? "id" : "en";
+    applyTranslations();
+  }
+
+  $("#langToggle").addEventListener("click", function () {
+    setLang(currentLang === "en" ? "id" : "en");
+  });
+
+  var toastStack = $("#toastStack");
+  function showToast(message, type, duration) {
+    duration = duration || 3200;
+    var toast = document.createElement("div");
+    toast.className = "toast" + (type === "error" ? " toast-error" : type === "success" ? " toast-success" : "");
+    toast.textContent = message;
+    toastStack.appendChild(toast);
+    setTimeout(function () {
+      toast.style.opacity = "0";
+      toast.style.transition = "opacity 0.2s ease";
+      setTimeout(function () { toast.remove(); }, 200);
+    }, duration);
+  }
+
+  var themeToggle = $("#themeToggle");
+  var root = document.documentElement;
+
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      root.setAttribute("data-theme", "dark");
+      themeToggle.setAttribute("aria-pressed", "true");
+    } else {
+      root.setAttribute("data-theme", "light");
+      themeToggle.setAttribute("aria-pressed", "false");
+    }
+  }
+
+  function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    if (saved) {
+      applyTheme(saved);
+    } else {
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(prefersDark ? "dark" : "light");
+    }
+  }
+
+  themeToggle.addEventListener("click", function () {
+    var current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    var next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) { showToast(t("err_theme_save"), "error"); }
+  });
+
+  initTheme();
+
+  var tabs = $all(".tab");
+  var panels = { qr: $("#panel-qr"), barcode: $("#panel-barcode") };
+
+  function setActiveTab(tabName) {
+    tabs.forEach(function (tab) {
+      var isActive = tab.dataset.tab === tabName;
+      tab.classList.toggle("active", isActive);
+      tab.setAttribute("aria-selected", String(isActive));
+    });
+    Object.keys(panels).forEach(function (name) {
+      panels[name].classList.toggle("active", name === tabName);
+    });
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () { setActiveTab(tab.dataset.tab); });
+  });
+
+  $all("[data-tab-target]").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      setActiveTab(link.dataset.tabTarget);
+    });
+  });
+
+  function downloadCanvasAsPng(canvas, filename) {
+    canvas.toBlob(function (blob) {
+      if (!blob) { showToast(t("err_download_prep"), "error"); return; }
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  }
+
+  var historyList = $("#historyList");
+  var historyEmpty = $("#historyEmpty");
+
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function saveHistory(items) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(items)); }
+    catch (e) { showToast(t("err_history_save"), "error"); }
+  }
+
+  function addHistoryEntry(type, data) {
+    var items = loadHistory();
+    items.unshift({ type: type, data: data, time: Date.now() });
+    saveHistory(items.slice(0, HISTORY_LIMIT));
+    renderHistory();
+  }
+
+  function formatRelativeTime(timestamp) {
+    var diffMin = Math.round((Date.now() - timestamp) / 60000);
+    if (diffMin < 1) return "now";
+    if (diffMin < 60) return diffMin + "m";
+    var diffHr = Math.round(diffMin / 60);
+    if (diffHr < 24) return diffHr + "h";
+    return Math.round(diffHr / 24) + "d";
+  }
+
+  function renderHistory() {
+    var items = loadHistory();
+    historyList.innerHTML = "";
+    if (items.length === 0) {
+      historyList.appendChild(historyEmpty);
+      return;
+    }
+    items.forEach(function (item, index) {
+      var li = document.createElement("li");
+      li.className = "history-item";
+      var typeTag = document.createElement("span");
+      typeTag.className = "history-type";
+      typeTag.textContent = item.type;
+      var dataSpan = document.createElement("span");
+      dataSpan.className = "history-data";
+      dataSpan.textContent = item.data;
+      dataSpan.title = item.data;
+      var timeSpan = document.createElement("span");
+      timeSpan.className = "history-time";
+      timeSpan.textContent = formatRelativeTime(item.time);
+      var useBtn = document.createElement("button");
+      useBtn.type = "button";
+      useBtn.innerHTML = "&#8635;";
+      useBtn.addEventListener("click", function () { reuseHistoryEntry(item); });
+      var deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.innerHTML = "&times;";
+      deleteBtn.addEventListener("click", function () { deleteHistoryEntry(index); });
+      li.appendChild(typeTag);
+      li.appendChild(dataSpan);
+      li.appendChild(timeSpan);
+      li.appendChild(useBtn);
+      li.appendChild(deleteBtn);
+      historyList.appendChild(li);
+    });
+  }
+
+  function deleteHistoryEntry(index) {
+    var items = loadHistory();
+    items.splice(index, 1);
+    saveHistory(items);
+    renderHistory();
+  }
+
+  function reuseHistoryEntry(item) {
+    if (item.type === "QR") {
+      setActiveTab("qr");
+      $("#qrInput").value = item.data;
+      $("#qrInput").focus();
+    } else {
+      setActiveTab("barcode");
+      $("#barcodeInput").value = item.data;
+      $("#barcodeFormat").value = item.type === "EAN13" ? "EAN13" : item.type === "UPC" ? "UPC" : "CODE128";
+      updateBarcodeHint();
+      $("#barcodeInput").focus();
+    }
+  }
+
+  $("#historyClearBtn").addEventListener("click", function () {
+    saveHistory([]);
+    renderHistory();
+    showToast(t("success_history_clear"));
+  });
+
+  renderHistory();
+
+  var qrInput = $("#qrInput");
+  var qrCanvasHolder = $("#qrCanvasHolder");
+  var qrEmptyState = $("#qrEmptyState");
+  var qrResultBox = $("#qrResultBox");
+
+  function libraryMissing() {
+    showToast(t("err_library"), "error", 4200);
+  }
+
+  function generateQr() {
+    var value = qrInput.value.trim();
+    if (!value) {
+      qrInput.classList.add("input-error");
+      showToast(t("err_empty"), "error");
+      return;
+    }
+    qrInput.classList.remove("input-error");
+    if (typeof QRCode === "undefined") { libraryMissing(); return; }
+
+    var size = parseInt($("#qrSize").value, 10);
+    var margin = parseInt($("#qrMargin").value, 10);
+    var ecc = $("#qrEcc").value;
+    var eccMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+
+    qrCanvasHolder.innerHTML = "";
+    qrCanvasHolder.style.padding = (margin * 2) + "px";
+
+    try {
+      new QRCode(qrCanvasHolder, { text: value, width: size, height: size, correctLevel: eccMap[ecc] || QRCode.CorrectLevel.M });
+    } catch (err) {
+      showToast(t("err_qr_generic"), "error");
+      return;
+    }
+
+    qrEmptyState.classList.add("is-hidden");
+    qrResultBox.classList.remove("is-hidden");
+    addHistoryEntry("QR", value);
+    showToast(t("success_qr"), "success");
+  }
+
+  function resetQr() {
+    qrInput.value = "";
+    qrInput.classList.remove("input-error");
+    qrCanvasHolder.innerHTML = "";
+    qrResultBox.classList.add("is-hidden");
+    qrEmptyState.classList.remove("is-hidden");
+  }
+
+  function downloadQr() {
+    var canvas = qrCanvasHolder.querySelector("canvas");
+    if (canvas) { downloadCanvasAsPng(canvas, "seqrcode-qrcode.png"); return; }
+    var img = qrCanvasHolder.querySelector("img");
+    if (img) {
+      var link = document.createElement("a");
+      link.href = img.src;
+      link.download = "seqrcode-qrcode.png";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return;
+    }
+    showToast(t("err_nothing_qr"), "error");
+  }
+
+  $("#qrGenerateBtn").addEventListener("click", generateQr);
+  $("#qrResetBtn").addEventListener("click", resetQr);
+  $("#qrDownloadBtn").addEventListener("click", downloadQr);
+  qrInput.addEventListener("keydown", function (e) { if (e.key === "Enter") generateQr(); });
+
+  var barcodeInput = $("#barcodeInput");
+  var barcodeFormatSelect = $("#barcodeFormat");
+  var barcodeSvg = $("#barcodeSvg");
+  var barcodeEmptyState = $("#barcodeEmptyState");
+  var barcodeResultBox = $("#barcodeResultBox");
+  var barcodeHint = $("#barcodeHint");
+
+  function updateBarcodeHint() {
+    var format = barcodeFormatSelect.value;
+    var key = format === "EAN13" ? "hint_ean13" : format === "UPC" ? "hint_upc" : "hint_code128";
+    barcodeHint.textContent = t(key);
+  }
+
+  barcodeFormatSelect.addEventListener("change", updateBarcodeHint);
+
+  function validateBarcodeValue(format, value) {
+    if (format === "EAN13" && !/^\d{12,13}$/.test(value)) return "err_ean13";
+    if (format === "UPC" && !/^\d{11,12}$/.test(value)) return "err_upc";
+    return null;
+  }
+
+  function generateBarcode() {
+    var value = barcodeInput.value.trim();
+    var format = barcodeFormatSelect.value;
+
+    if (!value) {
+      barcodeInput.classList.add("input-error");
+      showToast(t("err_empty"), "error");
+      return;
+    }
+
+    var errKey = validateBarcodeValue(format, value);
+    if (errKey) {
+      barcodeInput.classList.add("input-error");
+      showToast(t(errKey), "error");
+      return;
+    }
+    barcodeInput.classList.remove("input-error");
+
+    if (typeof JsBarcode === "undefined") { libraryMissing(); return; }
+
+    try {
+      JsBarcode(barcodeSvg, value, { format: format, lineColor: "#1C1B19", width: 2, height: 90, displayValue: true, margin: 10 });
+    } catch (err) {
+      showToast(t("err_barcode_generic"), "error");
+      return;
+    }
+
+    barcodeEmptyState.classList.add("is-hidden");
+    barcodeResultBox.classList.remove("is-hidden");
+    addHistoryEntry(format, value);
+    showToast(t("success_barcode"), "success");
+  }
+
+  function resetBarcode() {
+    barcodeInput.value = "";
+    barcodeInput.classList.remove("input-error");
+    while (barcodeSvg.firstChild) barcodeSvg.removeChild(barcodeSvg.firstChild);
+    barcodeResultBox.classList.add("is-hidden");
+    barcodeEmptyState.classList.remove("is-hidden");
+  }
+
+  function downloadBarcode() {
+    if (!barcodeSvg.firstChild) { showToast(t("err_nothing_barcode"), "error"); return; }
+    var svgData = new XMLSerializer().serializeToString(barcodeSvg);
+    var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    var url = URL.createObjectURL(svgBlob);
+    var img = new Image();
+    img.onload = function () {
+      var canvas = document.createElement("canvas");
+      var bbox = barcodeSvg.getBoundingClientRect();
+      canvas.width = bbox.width || img.width;
+      canvas.height = bbox.height || img.height;
+      var ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      downloadCanvasAsPng(canvas, "seqrcode-barcode.png");
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      showToast(t("err_download_prep"), "error");
+    };
+    img.src = url;
+  }
+
+  $("#barcodeGenerateBtn").addEventListener("click", generateBarcode);
+  $("#barcodeResetBtn").addEventListener("click", resetBarcode);
+  $("#barcodeDownloadBtn").addEventListener("click", downloadBarcode);
+  barcodeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") generateBarcode(); });
+
+  function openModal(id) { $("#" + id).classList.remove("is-hidden"); }
+  function closeModal(id) { $("#" + id).classList.add("is-hidden"); }
+
+  $("#privacyLink").addEventListener("click", function () { openModal("privacyModal"); });
+  $("#termsLink").addEventListener("click", function () { openModal("termsModal"); });
+  $all("[data-close-modal]").forEach(function (btn) {
+    btn.addEventListener("click", function () { closeModal(btn.dataset.closeModal); });
+  });
+  $all(".modal-overlay").forEach(function (overlay) {
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) overlay.classList.add("is-hidden");
+    });
+  });
+
+  $("#copyrightText").textContent = "© " + new Date().getFullYear() + " SeQRCode. All rights reserved.";
+
+  initLang();
+
+  window.addEventListener("load", function () {
+    if (typeof QRCode === "undefined" || typeof JsBarcode === "undefined") {
+      showToast(t("err_library"), "error", 5000);
+    }
+  });
+})();
+</script>
+</body>
+</html>
