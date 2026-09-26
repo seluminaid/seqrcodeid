@@ -146,6 +146,14 @@ button { font-family: inherit; cursor: pointer; }
 .toast { background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.88rem; box-shadow: var(--shadow); }
 .toast.toast-error { background: var(--danger); color: #fff; }
 .toast.toast-success { background: var(--success); color: #08240F; }
+.scan-preview { margin-top: 4px; border: 1px dashed var(--border); border-radius: var(--radius-md); min-height: 220px; display: flex; align-items: center; justify-content: center; padding: 12px; background: var(--surface-2); overflow: hidden; }
+.scan-preview video { width: 100%; max-height: 320px; border-radius: var(--radius-sm); background: #000; object-fit: cover; }
+.upload-label { display: inline-flex; align-items: center; justify-content: center; }
+.upload-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.scan-result { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.scan-result-text { margin: 0; font-size: 0.95rem; word-break: break-all; color: var(--text); max-width: 100%; }
+.scan-result-actions { gap: 10px; }
+.scan-result-actions .btn { max-width: none; flex: 1; }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
 @media (max-width: 640px) {
   .feature-grid { grid-template-columns: 1fr; gap: 20px; }
@@ -165,6 +173,8 @@ button { font-family: inherit; cursor: pointer; }
       SeQRCode
     </a>
     <nav class="nav-links" aria-label="Main navigation">
+      <a href="#tools" data-i18n="nav_tools">Tools</a>
+      <a href="#about" data-i18n="nav_about">About</a>
     </nav>
     <button id="langToggle" class="icon-btn lang-toggle" type="button">EN</button>
     <button id="themeToggle" class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
@@ -189,6 +199,7 @@ button { font-family: inherit; cursor: pointer; }
       <div class="tabs" role="tablist" aria-label="Generator type">
         <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-qr" id="tab-qr" data-tab="qr" data-i18n="tab_qr">QR Code</button>
         <button class="tab" role="tab" aria-selected="false" aria-controls="panel-barcode" id="tab-barcode" data-tab="barcode" data-i18n="tab_barcode">Barcode</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-scan" id="tab-scan" data-tab="scan" data-i18n="tab_scan">Scan</button>
       </div>
 
       <div class="panel active" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr">
@@ -283,6 +294,41 @@ button { font-family: inherit; cursor: pointer; }
         </div>
       </div>
 
+      <div class="panel" id="panel-scan" role="tabpanel" aria-labelledby="tab-scan">
+        <div class="scan-preview" id="scanPreviewArea">
+          <video id="scanVideo" class="is-hidden" autoplay muted playsinline></video>
+          <div class="empty-state" id="scanEmptyState">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8V6a2 2 0 0 1 2-2h2M4 16v2a2 2 0 0 0 2 2h2M20 8V6a2 2 0 0 0-2-2h-2M20 16v2a2 2 0 0 1-2 2h-2"/><circle cx="12" cy="12" r="3"/></svg>
+            <p data-i18n="empty_scan">Camera preview will appear here.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="scanStartBtn" type="button" data-i18n="btn_start_camera">Start Camera</button>
+          <button class="btn btn-ghost is-hidden" id="scanStopBtn" type="button" data-i18n="btn_stop_camera">Stop Camera</button>
+          <label class="btn btn-ghost upload-label" for="scanUploadInput" data-i18n="btn_upload_image">Upload Image</label>
+          <input type="file" id="scanUploadInput" accept="image/*" class="upload-input">
+        </div>
+
+        <div class="result-area" id="scanResultArea">
+          <div class="empty-state is-hidden" id="scanNoResultState">
+            <p data-i18n="empty_scan_result">Nothing scanned yet.</p>
+          </div>
+          <div class="result-box is-hidden" id="scanResultBox">
+            <div class="scan-result">
+              <span class="history-type" id="scanResultFormat">QR_CODE</span>
+              <p id="scanResultText" class="scan-result-text"></p>
+            </div>
+            <div class="result-actions scan-result-actions">
+              <button class="btn btn-ghost" id="scanCopyBtn" type="button" data-i18n="btn_copy">Copy</button>
+              <button class="btn btn-primary" id="scanUseBtn" type="button" data-i18n="btn_use_generator">Use in Generator</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint" data-i18n="scan_note">Camera access requires HTTPS or localhost. If you open this file directly from disk, your browser may block the camera.</p>
+      </div>
+
       <p class="privacy-note" data-i18n="privacy_note">Your data is processed locally in your browser.</p>
     </div>
 
@@ -361,7 +407,7 @@ button { font-family: inherit; cursor: pointer; }
       <h4 data-i18n="footer_company">Company</h4>
       <ul>
         <li><a href="#about" data-i18n="nav_about">About</a></li>
-        <li><a href="mailto:seqrcodeid@gmail.com" data-i18n="footer_contact">Contact</a></li>
+        <li><a href="mailto:hello@seqrcode.app" data-i18n="footer_contact">Contact</a></li>
         <li><button type="button" id="privacyLink" data-i18n="footer_privacy">Privacy Policy</button></li>
         <li><button type="button" id="termsLink" data-i18n="footer_terms">Terms of Service</button></li>
       </ul>
@@ -392,6 +438,7 @@ button { font-family: inherit; cursor: pointer; }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/JsBarcode/3.11.5/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
 <script>
 (function () {
   "use strict";
@@ -408,7 +455,7 @@ button { font-family: inherit; cursor: pointer; }
       nav_tools: "Tools", nav_about: "About",
       hero_title: "Generate QR Code &amp; Barcode Instantly",
       hero_sub: "Create QR codes and barcodes from text, links, or other data in seconds, right in your browser.",
-      tab_qr: "QR Code", tab_barcode: "Barcode",
+      tab_qr: "QR Code", tab_barcode: "Barcode", tab_scan: "Scan",
       label_text_url: "Text / URL", label_size: "Size", label_margin: "Margin", label_ecc: "Error correction",
       size_small: "Small (180px)", size_medium: "Medium (256px)", size_large: "Large (384px)",
       margin_none: "None", margin_small: "Small", margin_normal: "Normal", margin_wide: "Wide",
@@ -420,6 +467,11 @@ button { font-family: inherit; cursor: pointer; }
       hint_ean13: "EAN-13 requires exactly 12 or 13 digits.",
       hint_upc: "UPC requires exactly 11 or 12 digits.",
       privacy_note: "Your data is processed locally in your browser.",
+      empty_scan: "Camera preview will appear here.",
+      empty_scan_result: "Nothing scanned yet.",
+      btn_start_camera: "Start Camera", btn_stop_camera: "Stop Camera", btn_upload_image: "Upload Image",
+      btn_copy: "Copy", btn_use_generator: "Use in Generator",
+      scan_note: "Camera access requires HTTPS or localhost. If you open this file directly from disk, your browser may block the camera.",
       history_title: "History", history_clear: "Clear all", history_empty: "No codes generated yet.",
       why_title: "Why SeQRCode?",
       feature_fast_title: "Fast", feature_fast_desc: "Generate codes instantly.",
@@ -448,13 +500,18 @@ button { font-family: inherit; cursor: pointer; }
       err_nothing_qr: "Nothing to download yet, generate a QR code first.",
       err_nothing_barcode: "Nothing to download yet, generate a barcode first.",
       err_download_prep: "Could not prepare the file for download.",
-      success_qr: "QR code generated.", success_barcode: "Barcode generated.", success_history_clear: "History cleared."
+      err_camera_denied: "Camera access was denied or unavailable.",
+      err_camera_unsupported: "Camera scanning is not supported in this browser.",
+      err_scan_not_found: "No QR code or barcode was found in that image.",
+      err_copy: "Could not copy to clipboard.",
+      success_qr: "QR code generated.", success_barcode: "Barcode generated.", success_history_clear: "History cleared.",
+      success_scan: "Code scanned successfully.", success_copy: "Copied to clipboard."
     },
     id: {
       nav_tools: "Alat", nav_about: "Tentang",
       hero_title: "Buat QR Code &amp; Barcode Secara Instan",
       hero_sub: "Buat QR code dan barcode dari teks, tautan, atau data lainnya dalam hitungan detik, langsung di browser Anda.",
-      tab_qr: "Kode QR", tab_barcode: "Barcode",
+      tab_qr: "Kode QR", tab_barcode: "Barcode", tab_scan: "Pindai",
       label_text_url: "Teks / URL", label_size: "Ukuran", label_margin: "Margin", label_ecc: "Koreksi kesalahan",
       size_small: "Kecil (180px)", size_medium: "Sedang (256px)", size_large: "Besar (384px)",
       margin_none: "Tidak ada", margin_small: "Kecil", margin_normal: "Normal", margin_wide: "Lebar",
@@ -466,6 +523,11 @@ button { font-family: inherit; cursor: pointer; }
       hint_ean13: "EAN-13 harus terdiri dari 12–13 digit angka.",
       hint_upc: "UPC harus terdiri dari 11–12 digit angka.",
       privacy_note: "Data Anda diproses secara lokal di browser Anda.",
+      empty_scan: "Pratinjau kamera akan muncul di sini.",
+      empty_scan_result: "Belum ada yang dipindai.",
+      btn_start_camera: "Mulai Kamera", btn_stop_camera: "Hentikan Kamera", btn_upload_image: "Unggah Gambar",
+      btn_copy: "Salin", btn_use_generator: "Gunakan di Generator",
+      scan_note: "Akses kamera memerlukan HTTPS atau localhost. Jika file ini dibuka langsung dari disk, browser mungkin memblokir kamera.",
       history_title: "Riwayat", history_clear: "Hapus semua", history_empty: "Belum ada kode yang dibuat.",
       why_title: "Mengapa SeQRCode?",
       feature_fast_title: "Cepat", feature_fast_desc: "Buat kode secara instan.",
@@ -494,7 +556,12 @@ button { font-family: inherit; cursor: pointer; }
       err_nothing_qr: "Belum ada yang bisa diunduh, buat QR code terlebih dahulu.",
       err_nothing_barcode: "Belum ada yang bisa diunduh, buat barcode terlebih dahulu.",
       err_download_prep: "Gagal menyiapkan file untuk diunduh.",
-      success_qr: "QR code berhasil dibuat.", success_barcode: "Barcode berhasil dibuat.", success_history_clear: "Riwayat dihapus."
+      err_camera_denied: "Akses kamera ditolak atau tidak tersedia.",
+      err_camera_unsupported: "Pemindaian kamera tidak didukung di browser ini.",
+      err_scan_not_found: "Tidak ditemukan QR code atau barcode pada gambar tersebut.",
+      err_copy: "Gagal menyalin ke clipboard.",
+      success_qr: "QR code berhasil dibuat.", success_barcode: "Barcode berhasil dibuat.", success_history_clear: "Riwayat dihapus.",
+      success_scan: "Kode berhasil dipindai.", success_copy: "Disalin ke clipboard."
     }
   };
 
@@ -578,9 +645,12 @@ button { font-family: inherit; cursor: pointer; }
   initTheme();
 
   var tabs = $all(".tab");
-  var panels = { qr: $("#panel-qr"), barcode: $("#panel-barcode") };
+  var panels = { qr: $("#panel-qr"), barcode: $("#panel-barcode"), scan: $("#panel-scan") };
+  var currentActiveTab = "qr";
 
   function setActiveTab(tabName) {
+    if (currentActiveTab === "scan" && tabName !== "scan") { stopScan(); }
+    currentActiveTab = tabName;
     tabs.forEach(function (tab) {
       var isActive = tab.dataset.tab === tabName;
       tab.classList.toggle("active", isActive);
@@ -600,6 +670,18 @@ button { font-family: inherit; cursor: pointer; }
       setActiveTab(link.dataset.tabTarget);
     });
   });
+
+  function addQuietZone(sourceCanvas, paddingPx) {
+    if (!paddingPx) return sourceCanvas;
+    var framed = document.createElement("canvas");
+    framed.width = sourceCanvas.width + paddingPx * 2;
+    framed.height = sourceCanvas.height + paddingPx * 2;
+    var ctx = framed.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, framed.width, framed.height);
+    ctx.drawImage(sourceCanvas, paddingPx, paddingPx);
+    return framed;
+  }
 
   function downloadCanvasAsPng(canvas, filename) {
     canvas.toBlob(function (blob) {
@@ -737,13 +819,21 @@ button { font-family: inherit; cursor: pointer; }
     var eccMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
 
     qrCanvasHolder.innerHTML = "";
-    qrCanvasHolder.style.padding = (margin * 2) + "px";
+    qrCanvasHolder.style.padding = "0";
 
     try {
       new QRCode(qrCanvasHolder, { text: value, width: size, height: size, correctLevel: eccMap[ecc] || QRCode.CorrectLevel.M });
     } catch (err) {
       showToast(t("err_qr_generic"), "error");
       return;
+    }
+
+    var rawQrCanvas = qrCanvasHolder.querySelector("canvas");
+    if (rawQrCanvas) {
+      var quietZonePx = Math.round(size * (margin / 40));
+      var framedQrCanvas = addQuietZone(rawQrCanvas, quietZonePx);
+      qrCanvasHolder.innerHTML = "";
+      qrCanvasHolder.appendChild(framedQrCanvas);
     }
 
     qrEmptyState.classList.add("is-hidden");
@@ -859,7 +949,9 @@ button { font-family: inherit; cursor: pointer; }
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(url);
-      downloadCanvasAsPng(canvas, "seqrcode-barcode.png");
+      var barcodeQuietZonePx = Math.round(canvas.width * 0.06);
+      var framedBarcodeCanvas = addQuietZone(canvas, barcodeQuietZonePx);
+      downloadCanvasAsPng(framedBarcodeCanvas, "seqrcode-barcode.png");
     };
     img.onerror = function () {
       URL.revokeObjectURL(url);
@@ -872,6 +964,143 @@ button { font-family: inherit; cursor: pointer; }
   $("#barcodeResetBtn").addEventListener("click", resetBarcode);
   $("#barcodeDownloadBtn").addEventListener("click", downloadBarcode);
   barcodeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") generateBarcode(); });
+
+  var scanVideo = $("#scanVideo");
+  var scanEmptyState = $("#scanEmptyState");
+  var scanResultBox = $("#scanResultBox");
+  var scanNoResultState = $("#scanNoResultState");
+  var scanResultText = $("#scanResultText");
+  var scanResultFormat = $("#scanResultFormat");
+  var scanStartBtn = $("#scanStartBtn");
+  var scanStopBtn = $("#scanStopBtn");
+  var scanUploadInput = $("#scanUploadInput");
+  var scanCopyBtn = $("#scanCopyBtn");
+  var scanUseBtn = $("#scanUseBtn");
+
+  var codeReader = null;
+  var lastScannedValue = null;
+  var lastScanFormat = null;
+
+  function getZXingReader() {
+    if (!codeReader && typeof ZXing !== "undefined") {
+      codeReader = new ZXing.BrowserMultiFormatReader();
+    }
+    return codeReader;
+  }
+
+  function formatNameFromZXing(format) {
+    if (typeof ZXing === "undefined" || !ZXing.BarcodeFormat) return "CODE";
+    var names = Object.keys(ZXing.BarcodeFormat);
+    for (var i = 0; i < names.length; i++) {
+      if (ZXing.BarcodeFormat[names[i]] === format) return names[i];
+    }
+    return "CODE";
+  }
+
+  function showScanResult(text, formatName) {
+    scanResultText.textContent = text;
+    scanResultFormat.textContent = formatName;
+    scanNoResultState.classList.add("is-hidden");
+    scanResultBox.classList.remove("is-hidden");
+  }
+
+  function handleScanSuccess(text, formatName) {
+    if (text === lastScannedValue) return;
+    lastScannedValue = text;
+    lastScanFormat = formatName;
+    showScanResult(text, formatName);
+    addHistoryEntry(formatName === "QR_CODE" ? "QR" : formatName, text);
+    showToast(t("success_scan"), "success");
+  }
+
+  function startScan() {
+    if (typeof ZXing === "undefined") { libraryMissing(); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showToast(t("err_camera_unsupported"), "error");
+      return;
+    }
+    var reader = getZXingReader();
+    scanStartBtn.classList.add("is-hidden");
+    scanStopBtn.classList.remove("is-hidden");
+    scanVideo.classList.remove("is-hidden");
+    scanEmptyState.classList.add("is-hidden");
+    reader.decodeFromVideoDevice(undefined, scanVideo, function (result) {
+      if (result) {
+        handleScanSuccess(result.getText(), formatNameFromZXing(result.getBarcodeFormat()));
+      }
+    }).catch(function () {
+      showToast(t("err_camera_denied"), "error");
+      scanStartBtn.classList.remove("is-hidden");
+      scanStopBtn.classList.add("is-hidden");
+      scanVideo.classList.add("is-hidden");
+      scanEmptyState.classList.remove("is-hidden");
+    });
+  }
+
+  function stopScan() {
+    if (codeReader) {
+      try { codeReader.reset(); } catch (e) {}
+    }
+    scanStartBtn.classList.remove("is-hidden");
+    scanStopBtn.classList.add("is-hidden");
+    scanVideo.classList.add("is-hidden");
+    scanEmptyState.classList.remove("is-hidden");
+  }
+
+  scanStartBtn.addEventListener("click", startScan);
+  scanStopBtn.addEventListener("click", stopScan);
+
+  scanUploadInput.addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (typeof ZXing === "undefined") { libraryMissing(); return; }
+    var reader = getZXingReader();
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      reader.decodeFromImage(img).then(function (result) {
+        lastScannedValue = null;
+        handleScanSuccess(result.getText(), formatNameFromZXing(result.getBarcodeFormat()));
+      }).catch(function () {
+        showToast(t("err_scan_not_found"), "error");
+      }).then(function () {
+        URL.revokeObjectURL(url);
+      });
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      showToast(t("err_scan_not_found"), "error");
+    };
+    img.src = url;
+    scanUploadInput.value = "";
+  });
+
+  scanCopyBtn.addEventListener("click", function () {
+    if (!lastScannedValue) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastScannedValue).then(function () {
+        showToast(t("success_copy"), "success");
+      }).catch(function () {
+        showToast(t("err_copy"), "error");
+      });
+    } else {
+      showToast(t("err_copy"), "error");
+    }
+  });
+
+  scanUseBtn.addEventListener("click", function () {
+    if (!lastScannedValue) return;
+    if (lastScanFormat === "QR_CODE") {
+      setActiveTab("qr");
+      qrInput.value = lastScannedValue;
+    } else {
+      setActiveTab("barcode");
+      var mapped = lastScanFormat === "EAN_13" ? "EAN13" : (lastScanFormat === "UPC_A" || lastScanFormat === "UPC_E") ? "UPC" : "CODE128";
+      barcodeFormatSelect.value = mapped;
+      updateBarcodeHint();
+      barcodeInput.value = lastScannedValue;
+    }
+  });
 
   function openModal(id) { $("#" + id).classList.remove("is-hidden"); }
   function closeModal(id) { $("#" + id).classList.add("is-hidden"); }
@@ -892,7 +1121,7 @@ button { font-family: inherit; cursor: pointer; }
   initLang();
 
   window.addEventListener("load", function () {
-    if (typeof QRCode === "undefined" || typeof JsBarcode === "undefined") {
+    if (typeof QRCode === "undefined" || typeof JsBarcode === "undefined" || typeof ZXing === "undefined") {
       showToast(t("err_library"), "error", 5000);
     }
   });
