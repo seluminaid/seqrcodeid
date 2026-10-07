@@ -128,15 +128,6 @@ button { font-family: inherit; cursor: pointer; }
 .tool-card p { margin: 0; color: var(--text-dim); font-size: 0.88rem; }
 .tool-card-soon { opacity: 0.7; }
 .badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
-.footer { border-top: 1px solid var(--border); padding: 40px 0 0; }
-.footer-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }
-.footer-brand p.footer-title { font-family: var(--font-display); font-weight: 700; margin: 0 0 6px; font-size: 1.05rem; }
-.footer-brand p.footer-tag { margin: 0; color: var(--text-dim); font-size: 0.88rem; max-width: 260px; }
-.footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin: 0 0 12px; font-weight: 700; }
-.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.footer-col a, .footer-col button { background: none; border: none; padding: 0; text-align: left; font-size: 0.9rem; color: var(--text-dim); text-decoration: none; }
-.footer-col a:hover, .footer-col button:hover { color: var(--text); }
-.footer-bottom { border-top: 1px solid var(--border); margin-top: 32px; padding: 16px 20px; text-align: center; font-size: 0.82rem; color: var(--text-dim); }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
 .modal-box { background: var(--surface); border-radius: var(--radius-lg); max-width: 480px; width: 100%; padding: 24px; box-shadow: var(--shadow); max-height: 80vh; overflow-y: auto; }
 .modal-box h3 { margin-bottom: 12px; }
@@ -160,7 +151,27 @@ button { font-family: inherit; cursor: pointer; }
   .tools-grid { grid-template-columns: 1fr; }
   .generator-card { padding: 18px; }
   .options-row { flex-direction: column; }
-  .footer-inner { grid-template-columns: 1fr; }
+}
+.footer { border-top: 1px solid var(--border); padding: 40px 0 0; }
+.footer-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 24px; }
+.footer-brand p.footer-title { font-family: var(--font-display); font-weight: 700; margin: 0 0 6px; font-size: 1.05rem; }
+.footer-brand p.footer-tag { margin: 0; color: var(--text-dim); font-size: 0.88rem; max-width: 260px; }
+.footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin: 0 0 12px; font-weight: 700; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.footer-col a, .footer-col button { background: none; border: none; padding: 0; text-align: left; font-size: 0.9rem; color: var(--text-dim); text-decoration: none; cursor: pointer; }
+.footer-col a:hover, .footer-col button:hover { color: var(--text); }
+.footer-col a[aria-current] { color: var(--text); font-weight: 600; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 32px; font-size: 0.82rem; color: var(--text-dim); }
+.footer-bottom-in { max-width: 960px; margin: 0 auto; padding: 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.footer-top { display: none; color: var(--text-dim); text-decoration: none; }
+.footer-top:hover { color: var(--text); }
+@media (min-width: 721px) {
+  .footer { padding-top: 56px; }
+  .footer-inner { grid-template-columns: 1.6fr 1fr 1fr; gap: 48px; }
+  .footer-brand p.footer-tag { max-width: 300px; }
+  .footer-bottom { margin-top: 48px; }
+  .footer-bottom-in { flex-direction: row; justify-content: space-between; text-align: left; }
+  .footer-top { display: inline; }
 }
 </style>
 </head>
@@ -324,7 +335,6 @@ button { font-family: inherit; cursor: pointer; }
           </div>
         </div>
 
-        <p class="hint" data-i18n="scan_note">Camera access requires HTTPS or localhost. If you open this file directly from disk, your browser may block the camera.</p>
       </div>
 
       <p class="privacy-note" data-i18n="privacy_note">Your data is processed locally in your browser.</p>
@@ -394,25 +404,27 @@ button { font-family: inherit; cursor: pointer; }
       <p class="footer-tag" data-i18n="footer_tag">Simple tools for everyday digital needs.</p>
     </div>
     <div class="footer-col">
-      <h4 data-i18n="footer_product">Product</h4>
-      <ul>
-        <li><a href="#generator" data-tab-target="qr" data-i18n="tab_qr">QR Code</a></li>
-        <li><a href="#generator" data-tab-target="barcode" data-i18n="tab_barcode">Barcode</a></li>
-        <li><a href="#tools" data-i18n="nav_tools">Tools</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
       <h4 data-i18n="footer_company">Company</h4>
       <ul>
         <li><a href="#about" data-i18n="nav_about">About</a></li>
-        <li><a href="mailto:hello@seqrcode.app" data-i18n="footer_contact">Contact</a></li>
+        <li><a href="mailto: seluminaid@gmail.com" data-i18n="footer_contact">Contact</a></li>
         <li><button type="button" id="privacyLink" data-i18n="footer_privacy">Privacy Policy</button></li>
         <li><button type="button" id="termsLink" data-i18n="footer_terms">Terms of Service</button></li>
       </ul>
     </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_suite">SeLuminaID Products</h4>
+      <ul>
+        <li><a href="#top" aria-current="page">SeQRCode</a></li>
+        <li><a href="https://seluminaid.github.io/secompressid/">SeCompress</a></li>
+      </ul>
+    </div>
   </div>
   <div class="footer-bottom">
-    <span id="copyrightText">© 2026 SeQRCode. All rights reserved.</span>
+    <div class="footer-bottom-in">
+      <span id="copyrightText">© 2026 SeQRCode. All rights reserved.</span>
+      <a class="footer-top" href="#top" data-i18n="footer_top">Back to top</a>
+    </div>
   </div>
 </footer>
 
@@ -434,9 +446,40 @@ button { font-family: inherit; cursor: pointer; }
 
 <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/JsBarcode/3.11.5/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
+<script>
+(function () {
+  function loadScript(urls, check) {
+    return new Promise(function (resolve) {
+      var i = 0;
+      (function next() {
+        if (check()) { resolve(true); return; }
+        if (i >= urls.length) { resolve(false); return; }
+        var el = document.createElement("script");
+        el.src = urls[i++];
+        el.onload = function () { check() ? resolve(true) : next(); };
+        el.onerror = next;
+        document.head.appendChild(el);
+      })();
+    });
+  }
+  window.libsReady = Promise.all([
+    loadScript([
+      "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js",
+      "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",
+      "https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"
+    ], function () { return typeof QRCode !== "undefined"; }),
+    loadScript([
+      "https://cdnjs.cloudflare.com/ajax/libs/JsBarcode/3.11.5/JsBarcode.all.min.js",
+      "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js",
+      "https://unpkg.com/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"
+    ], function () { return typeof JsBarcode !== "undefined"; }),
+    loadScript([
+      "https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js",
+      "https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"
+    ], function () { return typeof ZXing !== "undefined"; })
+  ]);
+})();
+</script>
 <script>
 (function () {
   "use strict";
@@ -469,7 +512,6 @@ button { font-family: inherit; cursor: pointer; }
       empty_scan_result: "Nothing scanned yet.",
       btn_start_camera: "Start Camera", btn_stop_camera: "Stop Camera", btn_upload_image: "Upload Image",
       btn_copy: "Copy", btn_use_generator: "Use in Generator",
-      scan_note: "Camera access requires HTTPS or localhost. If you open this file directly from disk, your browser may block the camera.",
       history_title: "History", history_clear: "Clear all", history_empty: "No codes generated yet.",
       why_title: "Why SeQRCode?",
       feature_fast_title: "Fast", feature_fast_desc: "Generate codes instantly.",
@@ -482,7 +524,7 @@ button { font-family: inherit; cursor: pointer; }
       tool_text_title: "Text to QR", tool_text_desc: "Batch-generate QR codes from a text list.",
       coming_soon: "Coming Soon",
       footer_tag: "Simple tools for everyday digital needs.",
-      footer_product: "Product", footer_company: "Company",
+      footer_suite: "SeLuminaID Products", footer_top: "Back to top", footer_company: "Company",
       footer_contact: "Contact", footer_privacy: "Privacy Policy", footer_terms: "Terms of Service",
       privacy_body: "SeQRCode processes every QR code and barcode directly in your browser. Nothing you type is sent to a server, and no personal data is collected.",
       terms_body: "SeQRCode is provided as-is, free of charge, for generating QR codes and barcodes. You are responsible for the content you encode.",
@@ -525,7 +567,6 @@ button { font-family: inherit; cursor: pointer; }
       empty_scan_result: "Belum ada yang dipindai.",
       btn_start_camera: "Mulai Kamera", btn_stop_camera: "Hentikan Kamera", btn_upload_image: "Unggah Gambar",
       btn_copy: "Salin", btn_use_generator: "Gunakan di Generator",
-      scan_note: "Akses kamera memerlukan HTTPS atau localhost. Jika file ini dibuka langsung dari disk, browser mungkin memblokir kamera.",
       history_title: "Riwayat", history_clear: "Hapus semua", history_empty: "Belum ada kode yang dibuat.",
       why_title: "Mengapa SeQRCode?",
       feature_fast_title: "Cepat", feature_fast_desc: "Buat kode secara instan.",
@@ -538,7 +579,7 @@ button { font-family: inherit; cursor: pointer; }
       tool_text_title: "Teks ke QR", tool_text_desc: "Buat banyak QR code sekaligus dari daftar teks.",
       coming_soon: "Segera Hadir",
       footer_tag: "Alat sederhana untuk kebutuhan digital sehari-hari.",
-      footer_product: "Produk", footer_company: "Perusahaan",
+      footer_suite: "Produk SeLuminaID", footer_top: "Kembali ke atas", footer_company: "Perusahaan",
       footer_contact: "Kontak", footer_privacy: "Kebijakan Privasi", footer_terms: "Ketentuan Layanan",
       privacy_body: "SeQRCode memproses setiap QR code dan barcode langsung di browser Anda. Tidak ada yang Anda ketik dikirim ke server, dan tidak ada data pribadi yang dikumpulkan.",
       terms_body: "SeQRCode disediakan apa adanya, gratis, untuk membuat QR code dan barcode. Anda bertanggung jawab atas konten yang Anda enkode.",
@@ -809,7 +850,7 @@ button { font-family: inherit; cursor: pointer; }
       return;
     }
     qrInput.classList.remove("input-error");
-    if (typeof QRCode === "undefined") { libraryMissing(); return; }
+    if (typeof QRCode === "undefined") { window.libsReady.then(function () { if (typeof QRCode === "undefined") libraryMissing(); else generateQr(); }); return; }
 
     var size = parseInt($("#qrSize").value, 10);
     var margin = parseInt($("#qrMargin").value, 10);
@@ -908,7 +949,7 @@ button { font-family: inherit; cursor: pointer; }
     }
     barcodeInput.classList.remove("input-error");
 
-    if (typeof JsBarcode === "undefined") { libraryMissing(); return; }
+    if (typeof JsBarcode === "undefined") { window.libsReady.then(function () { if (typeof JsBarcode === "undefined") libraryMissing(); else generateBarcode(); }); return; }
 
     try {
       JsBarcode(barcodeSvg, value, { format: format, lineColor: "#1C1B19", width: 2, height: 90, displayValue: true, margin: 10 });
@@ -1012,7 +1053,7 @@ button { font-family: inherit; cursor: pointer; }
   }
 
   function startScan() {
-    if (typeof ZXing === "undefined") { libraryMissing(); return; }
+    if (typeof ZXing === "undefined") { window.libsReady.then(function () { if (typeof ZXing === "undefined") libraryMissing(); else startScan(); }); return; }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       showToast(t("err_camera_unsupported"), "error");
       return;
@@ -1051,7 +1092,7 @@ button { font-family: inherit; cursor: pointer; }
   scanUploadInput.addEventListener("change", function (e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
-    if (typeof ZXing === "undefined") { libraryMissing(); return; }
+    if (typeof ZXing === "undefined") { window.libsReady.then(function () { if (typeof ZXing === "undefined") libraryMissing(); else scanUploadInput.dispatchEvent(new Event("change")); }); return; }
     var reader = getZXingReader();
     var url = URL.createObjectURL(file);
     var img = new Image();
@@ -1118,11 +1159,6 @@ button { font-family: inherit; cursor: pointer; }
 
   initLang();
 
-  window.addEventListener("load", function () {
-    if (typeof QRCode === "undefined" || typeof JsBarcode === "undefined" || typeof ZXing === "undefined") {
-      showToast(t("err_library"), "error", 5000);
-    }
-  });
 })();
 </script>
 </body>
