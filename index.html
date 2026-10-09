@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#B5772E" id="browserThemeColor">
 <title>SeQRCode — QR Code & Barcode Generator</title>
 <meta name="description" content="Generate QR codes and barcodes quickly from text, links, and other data.">
 <meta property="og:title" content="SeQRCode — QR Code & Barcode Generator">
@@ -654,13 +655,11 @@ button { font-family: inherit; cursor: pointer; }
   var root = document.documentElement;
 
   function applyTheme(theme) {
-    if (theme === "dark") {
-      root.setAttribute("data-theme", "dark");
-      themeToggle.setAttribute("aria-pressed", "true");
-    } else {
-      root.setAttribute("data-theme", "light");
-      themeToggle.setAttribute("aria-pressed", "false");
-    }
+    var isDark = theme === "dark";
+    root.setAttribute("data-theme", isDark ? "dark" : "light");
+    themeToggle.setAttribute("aria-pressed", isDark ? "true" : "false");
+    var browserThemeColor = document.getElementById("browserThemeColor");
+    if (browserThemeColor) browserThemeColor.setAttribute("content", isDark ? "#121316" : "#B5772E");
   }
 
   function initTheme() {
